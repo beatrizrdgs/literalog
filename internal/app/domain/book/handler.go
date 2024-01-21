@@ -14,7 +14,7 @@ type Handler interface {
 	Update(w http.ResponseWriter, r *http.Request)
 	Delete(w http.ResponseWriter, r *http.Request)
 	GetAll(w http.ResponseWriter, r *http.Request)
-	GetById(w http.ResponseWriter, r *http.Request)
+	GetByID(w http.ResponseWriter, r *http.Request)
 
 	Routes() *mux.Router
 }
@@ -39,7 +39,7 @@ func (h *handler) setupRoutes() {
 	h.router.HandleFunc("/", h.Create).Methods(http.MethodPost)
 	h.router.HandleFunc("/", h.Update).Methods(http.MethodPut)
 	h.router.HandleFunc("/{id}", h.Delete).Methods(http.MethodDelete)
-	h.router.HandleFunc("/{id}", h.GetById).Methods(http.MethodGet)
+	h.router.HandleFunc("/{id}", h.GetByID).Methods(http.MethodGet)
 	h.router.HandleFunc("/", h.GetAll).Methods(http.MethodGet)
 }
 
@@ -104,11 +104,11 @@ func (h *handler) GetAll(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(books)
 }
 
-func (h *handler) GetById(w http.ResponseWriter, r *http.Request) {
+func (h *handler) GetByID(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	id := mux.Vars(r)["id"]
 
-	book, err := h.service.GetById(ctx, id)
+	book, err := h.service.GetByID(ctx, id)
 	if err != nil {
 		cerrors.Handle(err, w)
 		return

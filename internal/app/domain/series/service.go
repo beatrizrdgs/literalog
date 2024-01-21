@@ -10,7 +10,7 @@ type Service interface {
 	Create(ctx context.Context, series *models.Series) error
 	Update(ctx context.Context, series *models.Series) error
 	Delete(ctx context.Context, id string) error
-	GetById(ctx context.Context, id string) (*models.Series, error)
+	GetByID(ctx context.Context, id string) (*models.Series, error)
 	GetAll(ctx context.Context) ([]models.Series, error)
 }
 
@@ -41,17 +41,17 @@ func (s *service) Update(ctx context.Context, series *models.Series) error {
 
 func (s *service) Delete(ctx context.Context, id string) error {
 	if id == "" {
-		return ErrEmptyId
+		return ErrEmptyID
 	}
 	return s.repository.Delete(ctx, id)
 }
 
-func (s *service) GetById(ctx context.Context, id string) (*models.Series, error) {
+func (s *service) GetByID(ctx context.Context, id string) (*models.Series, error) {
 	if id == "" {
-		return nil, ErrEmptyId
+		return nil, ErrEmptyID
 	}
 
-	series, err := s.repository.GetById(ctx, id)
+	series, err := s.repository.GetByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +60,7 @@ func (s *service) GetById(ctx context.Context, id string) (*models.Series, error
 		return nil, err
 	}
 
-	return s.repository.GetById(ctx, id)
+	return s.repository.GetByID(ctx, id)
 }
 
 func (s *service) GetAll(ctx context.Context) ([]models.Series, error) {

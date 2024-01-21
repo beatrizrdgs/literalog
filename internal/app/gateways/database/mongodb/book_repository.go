@@ -30,7 +30,7 @@ func (r *BookRepository) Create(ctx context.Context, book *models.Book) error {
 }
 
 func (r *BookRepository) Update(ctx context.Context, book *models.Book) error {
-	filter := bson.M{"_id": book.Id}
+	filter := bson.M{"_id": book.ID}
 	update := bson.M{"$set": book}
 	if _, err := r.collection.UpdateOne(ctx, filter, update); err != nil {
 		return fmt.Errorf("error updating book: %w", err)
@@ -46,7 +46,7 @@ func (r *BookRepository) Delete(ctx context.Context, id string) error {
 	return nil
 }
 
-func (r *BookRepository) GetById(ctx context.Context, id string) (*models.Book, error) {
+func (r *BookRepository) GetByID(ctx context.Context, id string) (*models.Book, error) {
 	filter := bson.M{"_id": id}
 	book := new(models.Book)
 	if err := r.collection.FindOne(ctx, filter).Decode(book); err != nil {

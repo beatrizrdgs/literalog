@@ -30,7 +30,7 @@ func (r *AuthorRepository) Create(ctx context.Context, author *models.Author) er
 }
 
 func (r *AuthorRepository) Update(ctx context.Context, author *models.Author) error {
-	filter := bson.M{"_id": author.Id}
+	filter := bson.M{"_id": author.ID}
 	update := bson.M{"$set": author}
 	if _, err := r.collection.UpdateOne(ctx, filter, update); err != nil {
 		return fmt.Errorf("error updating author: %w", err)
@@ -46,7 +46,7 @@ func (r *AuthorRepository) Delete(ctx context.Context, id string) error {
 	return nil
 }
 
-func (r *AuthorRepository) GetById(ctx context.Context, id string) (*models.Author, error) {
+func (r *AuthorRepository) GetByID(ctx context.Context, id string) (*models.Author, error) {
 	filter := bson.M{"_id": id}
 	author := new(models.Author)
 	if err := r.collection.FindOne(ctx, filter).Decode(author); err != nil {

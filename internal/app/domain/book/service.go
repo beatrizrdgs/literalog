@@ -12,9 +12,10 @@ import (
 
 type Service interface {
 	Create(ctx context.Context, book *models.Book) error
+	CreateByISBN(ctx context.Context, isbn string) error
 	Update(ctx context.Context, book *models.Book) error
 	Delete(ctx context.Context, id string) error
-	GetById(ctx context.Context, id string) (*models.Book, error)
+	GetByID(ctx context.Context, id string) (*models.Book, error)
 	GetAll(ctx context.Context) ([]models.Book, error)
 }
 
@@ -33,12 +34,12 @@ func NewService(repo Repository) Service {
 }
 
 func (s *service) Create(ctx context.Context, book *models.Book) error {
-	_, err := s.authorService.GetById(ctx, book.AuthorId)
+	_, err := s.authorService.GetByID(ctx, book.AuthorID)
 	if err != nil {
 		return err
 	}
 
-	_, err = s.seriesService.GetById(ctx, book.SeriesId)
+	_, err = s.seriesService.GetByID(ctx, book.SeriesID)
 	if err != nil {
 		return err
 	}
@@ -56,13 +57,17 @@ func (s *service) Create(ctx context.Context, book *models.Book) error {
 	return s.repository.Create(ctx, book)
 }
 
+func (s *service) CreateByISBN(ctx context.Context, isbn string) error {
+	return nil
+}
+
 func (s *service) Update(ctx context.Context, book *models.Book) error {
-	_, err := s.authorService.GetById(ctx, book.AuthorId)
+	_, err := s.authorService.GetByID(ctx, book.AuthorID)
 	if err != nil {
 		return err
 	}
 
-	_, err = s.seriesService.GetById(ctx, book.SeriesId)
+	_, err = s.seriesService.GetByID(ctx, book.SeriesID)
 	if err != nil {
 		return fmt.Errorf("error getting series: %w", err)
 	}
@@ -83,17 +88,17 @@ func (s *service) Update(ctx context.Context, book *models.Book) error {
 
 func (s *service) Delete(ctx context.Context, id string) error {
 	if id == "" {
-		return ErrEmptyId
+		return ErrEmptyID
 	}
 	return s.repository.Delete(ctx, id)
 }
 
-func (s *service) GetById(ctx context.Context, id string) (*models.Book, error) {
+func (s *service) GetByID(ctx context.Context, id string) (*models.Book, error) {
 	if id == "" {
-		return nil, ErrEmptyId
+		return nil, ErrEmptyID
 	}
 
-	book, err := s.repository.GetById(ctx, id)
+	book, err := s.repository.GetByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}

@@ -10,7 +10,7 @@ type Service interface {
 	Create(ctx context.Context, genre *models.Genre) error
 	Update(ctx context.Context, genre *models.Genre) error
 	Delete(ctx context.Context, id string) error
-	GetById(ctx context.Context, id string) (*models.Genre, error)
+	GetByID(ctx context.Context, id string) (*models.Genre, error)
 	GetByName(ctx context.Context, name string) (*models.Genre, error)
 	GetAll(ctx context.Context) ([]models.Genre, error)
 }
@@ -42,17 +42,17 @@ func (s *service) Update(ctx context.Context, genre *models.Genre) error {
 
 func (s *service) Delete(ctx context.Context, id string) error {
 	if id == "" {
-		return ErrEmptyId
+		return ErrEmptyID
 	}
 	return s.repository.Delete(ctx, id)
 }
 
-func (s *service) GetById(ctx context.Context, id string) (*models.Genre, error) {
+func (s *service) GetByID(ctx context.Context, id string) (*models.Genre, error) {
 	if id == "" {
-		return nil, ErrEmptyId
+		return nil, ErrEmptyID
 	}
 
-	genre, err := s.repository.GetById(ctx, id)
+	genre, err := s.repository.GetByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -61,7 +61,7 @@ func (s *service) GetById(ctx context.Context, id string) (*models.Genre, error)
 		return nil, err
 	}
 
-	return s.repository.GetById(ctx, id)
+	return s.repository.GetByID(ctx, id)
 }
 
 func (s *service) GetByName(ctx context.Context, name string) (*models.Genre, error) {

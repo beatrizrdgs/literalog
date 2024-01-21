@@ -30,7 +30,7 @@ func (r *SeriesRepository) Create(ctx context.Context, series *models.Series) er
 }
 
 func (r *SeriesRepository) Update(ctx context.Context, series *models.Series) error {
-	filter := bson.M{"_id": series.Id}
+	filter := bson.M{"_id": series.ID}
 	update := bson.M{"$set": series}
 	if _, err := r.collection.UpdateOne(ctx, filter, update); err != nil {
 		return fmt.Errorf("error updating series: %w", err)
@@ -46,7 +46,7 @@ func (r *SeriesRepository) Delete(ctx context.Context, id string) error {
 	return nil
 }
 
-func (r *SeriesRepository) GetById(ctx context.Context, id string) (*models.Series, error) {
+func (r *SeriesRepository) GetByID(ctx context.Context, id string) (*models.Series, error) {
 	filter := bson.M{"_id": id}
 	series := new(models.Series)
 	if err := r.collection.FindOne(ctx, filter).Decode(series); err != nil {

@@ -3,7 +3,7 @@ package models
 import "github.com/google/uuid"
 
 type Series struct {
-	Id   string `json:"id" bson:"_id"`
+	ID   string `json:"id" bson:"_id"`
 	Name string `json:"name" bson:"name"`
 }
 
@@ -13,7 +13,7 @@ type SeriesRequest struct {
 
 func NewSeries(req SeriesRequest) *Series {
 	return &Series{
-		Id:   uuid.NewString(),
+		ID:   uuid.NewString(),
 		Name: req.Name,
 	}
 }

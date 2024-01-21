@@ -3,7 +3,7 @@ package models
 import "github.com/google/uuid"
 
 type Author struct {
-	Id   string `json:"id"`
+	ID   string `json:"id"`
 	Name string `json:"name"`
 }
 
@@ -13,7 +13,7 @@ type AuthorRequest struct {
 
 func NewAuthor(req AuthorRequest) *Author {
 	return &Author{
-		Id:   uuid.NewString(),
+		ID:   uuid.NewString(),
 		Name: req.Name,
 	}
 }
