@@ -7,8 +7,8 @@ import (
 )
 
 type Service interface {
-	Create(ctx context.Context, g *models.Genre) error
-	Update(ctx context.Context, g *models.Genre) error
+	Create(ctx context.Context, genre *models.Genre) error
+	Update(ctx context.Context, genre *models.Genre) error
 	Delete(ctx context.Context, id string) error
 	GetById(ctx context.Context, id string) (*models.Genre, error)
 	GetByName(ctx context.Context, name string) (*models.Genre, error)
@@ -17,6 +17,7 @@ type Service interface {
 
 type service struct {
 	repository Repository
+	validator  Validator
 }
 
 func NewService(r Repository) Service {
@@ -25,26 +26,72 @@ func NewService(r Repository) Service {
 	}
 }
 
-func (s *service) Create(ctx context.Context, g *models.Genre) error {
-	return s.repository.Create(ctx, g)
+func (s *service) Create(ctx context.Context, genre *models.Genre) error {
+	if err := s.validator.Validate(genre); err != nil {
+		return err
+	}
+	return s.repository.Create(ctx, genre)
 }
 
-func (s *service) Update(ctx context.Context, g *models.Genre) error {
-	return s.repository.Update(ctx, g)
+func (s *service) Update(ctx context.Context, genre *models.Genre) error {
+	if err := s.validator.Validate(genre); err != nil {
+		return err
+	}
+	return s.repository.Update(ctx, genre)
 }
 
 func (s *service) Delete(ctx context.Context, id string) error {
+	if id == "" {
+		return ErrEmptyId
+	}
 	return s.repository.Delete(ctx, id)
 }
 
 func (s *service) GetById(ctx context.Context, id string) (*models.Genre, error) {
+	if id == "" {
+		return nil, ErrEmptyId
+	}
+
+	genre, err := s.repository.GetById(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := s.validator.Validate(genre); err != nil {
+		return nil, err
+	}
+
 	return s.repository.GetById(ctx, id)
 }
 
 func (s *service) GetByName(ctx context.Context, name string) (*models.Genre, error) {
+	if name == "" {
+		return nil, ErrEmptyName
+	}
+
+	genre, err := s.repository.GetByName(ctx, name)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := s.validator.Validate(genre); err != nil {
+		return nil, err
+	}
+
 	return s.repository.GetByName(ctx, name)
 }
 
 func (s *service) GetAll(ctx context.Context) ([]models.Genre, error) {
-	return s.repository.GetAll(ctx)
+	genre, err := s.repository.GetAll(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	for i := range genre {
+		if err := s.validator.Validate(&genre[i]); err != nil {
+			return nil, err
+		}
+	}
+
+	return genre, nil
 }

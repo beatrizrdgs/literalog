@@ -21,17 +21,17 @@ func NewBookRepository(collection *mongo.Collection) book.Repository {
 	}
 }
 
-func (r *BookRepository) Create(ctx context.Context, b *models.Book) error {
-	_, err := r.collection.InsertOne(ctx, b)
+func (r *BookRepository) Create(ctx context.Context, book *models.Book) error {
+	_, err := r.collection.InsertOne(ctx, book)
 	if err != nil {
 		return fmt.Errorf("error creating book: %w", err)
 	}
 	return nil
 }
 
-func (r *BookRepository) Update(ctx context.Context, b *models.Book) error {
-	filter := bson.M{"_id": b.Id}
-	update := bson.M{"$set": b}
+func (r *BookRepository) Update(ctx context.Context, book *models.Book) error {
+	filter := bson.M{"_id": book.Id}
+	update := bson.M{"$set": book}
 	if _, err := r.collection.UpdateOne(ctx, filter, update); err != nil {
 		return fmt.Errorf("error updating book: %w", err)
 	}
@@ -48,24 +48,24 @@ func (r *BookRepository) Delete(ctx context.Context, id string) error {
 
 func (r *BookRepository) GetById(ctx context.Context, id string) (*models.Book, error) {
 	filter := bson.M{"_id": id}
-	b := new(models.Book)
-	if err := r.collection.FindOne(ctx, filter).Decode(b); err != nil {
+	book := new(models.Book)
+	if err := r.collection.FindOne(ctx, filter).Decode(book); err != nil {
 		return nil, fmt.Errorf("error getting book: %w", err)
 	}
-	return b, nil
+	return book, nil
 }
 
 func (r *BookRepository) GetAll(ctx context.Context) ([]models.Book, error) {
-	bb := make([]models.Book, 0)
+	books := make([]models.Book, 0)
 	cur, err := r.collection.Find(ctx, bson.D{})
 	if err != nil {
 		return nil, fmt.Errorf("error getting book: %w", err)
 	}
 	defer cur.Close(ctx)
 
-	if err := cur.All(ctx, &bb); err != nil {
+	if err := cur.All(ctx, &books); err != nil {
 		return nil, fmt.Errorf("error getting books: %w", err)
 	}
 
-	return bb, nil
+	return books, nil
 }

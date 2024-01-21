@@ -52,15 +52,15 @@ func (h *handler) Create(w http.ResponseWriter, r *http.Request) {
 	req := new(models.BookRequest)
 	json.NewDecoder(r.Body).Decode(&req)
 
-	b := models.NewBook(*req)
-	if err := h.service.Create(ctx, b); err != nil {
+	book := models.NewBook(*req)
+	if err := h.service.Create(ctx, book); err != nil {
 		cerrors.Handle(err, w)
 		return
 	}
 
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(b)
+	json.NewEncoder(w).Encode(book)
 }
 
 func (h *handler) Update(w http.ResponseWriter, r *http.Request) {
@@ -68,15 +68,15 @@ func (h *handler) Update(w http.ResponseWriter, r *http.Request) {
 	req := new(models.BookRequest)
 	json.NewDecoder(r.Body).Decode(&req)
 
-	b := models.NewBook(*req)
-	if err := h.service.Update(ctx, b); err != nil {
+	book := models.NewBook(*req)
+	if err := h.service.Update(ctx, book); err != nil {
 		cerrors.Handle(err, w)
 		return
 	}
 
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(b)
+	json.NewEncoder(w).Encode(book)
 }
 
 func (h *handler) Delete(w http.ResponseWriter, r *http.Request) {
@@ -94,26 +94,26 @@ func (h *handler) Delete(w http.ResponseWriter, r *http.Request) {
 func (h *handler) GetAll(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	bb, err := h.service.GetAll(ctx)
+	books, err := h.service.GetAll(ctx)
 	if err != nil {
 		cerrors.Handle(err, w)
 		return
 	}
 
 	w.Header().Add("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(bb)
+	json.NewEncoder(w).Encode(books)
 }
 
 func (h *handler) GetById(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	id := mux.Vars(r)["id"]
 
-	b, err := h.service.GetById(ctx, id)
+	book, err := h.service.GetById(ctx, id)
 	if err != nil {
 		cerrors.Handle(err, w)
 		return
 	}
 
 	w.Header().Add("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(b)
+	json.NewEncoder(w).Encode(book)
 }

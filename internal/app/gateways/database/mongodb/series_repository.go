@@ -21,17 +21,17 @@ func NewSeriesRepository(collection *mongo.Collection) series.Repository {
 	}
 }
 
-func (r *SeriesRepository) Create(ctx context.Context, s *models.Series) error {
-	_, err := r.collection.InsertOne(ctx, s)
+func (r *SeriesRepository) Create(ctx context.Context, series *models.Series) error {
+	_, err := r.collection.InsertOne(ctx, series)
 	if err != nil {
 		return fmt.Errorf("error creating series: %w", err)
 	}
 	return nil
 }
 
-func (r *SeriesRepository) Update(ctx context.Context, s *models.Series) error {
-	filter := bson.M{"_id": s.Id}
-	update := bson.M{"$set": s}
+func (r *SeriesRepository) Update(ctx context.Context, series *models.Series) error {
+	filter := bson.M{"_id": series.Id}
+	update := bson.M{"$set": series}
 	if _, err := r.collection.UpdateOne(ctx, filter, update); err != nil {
 		return fmt.Errorf("error updating series: %w", err)
 	}
@@ -48,24 +48,33 @@ func (r *SeriesRepository) Delete(ctx context.Context, id string) error {
 
 func (r *SeriesRepository) GetById(ctx context.Context, id string) (*models.Series, error) {
 	filter := bson.M{"_id": id}
-	s := new(models.Series)
-	if err := r.collection.FindOne(ctx, filter).Decode(s); err != nil {
+	series := new(models.Series)
+	if err := r.collection.FindOne(ctx, filter).Decode(series); err != nil {
 		return nil, fmt.Errorf("error getting series: %w", err)
 	}
-	return s, nil
+	return series, nil
+}
+
+func (r *SeriesRepository) GetByName(ctx context.Context, name string) (*models.Series, error) {
+	filter := bson.M{"name": name}
+	series := new(models.Series)
+	if err := r.collection.FindOne(ctx, filter).Decode(series); err != nil {
+		return nil, fmt.Errorf("error getting series: %w", err)
+	}
+	return series, nil
 }
 
 func (r *SeriesRepository) GetAll(ctx context.Context) ([]models.Series, error) {
-	ss := make([]models.Series, 0)
+	series := make([]models.Series, 0)
 	cur, err := r.collection.Find(ctx, bson.D{})
 	if err != nil {
 		return nil, fmt.Errorf("error getting series: %w", err)
 	}
 	defer cur.Close(ctx)
 
-	if err := cur.All(ctx, &ss); err != nil {
+	if err := cur.All(ctx, &series); err != nil {
 		return nil, fmt.Errorf("error getting series: %w", err)
 	}
 
-	return ss, nil
+	return series, nil
 }

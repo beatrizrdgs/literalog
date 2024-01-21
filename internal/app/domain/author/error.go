@@ -1,4 +1,4 @@
-package series
+package author
 
 import (
 	"net/http"

@@ -11,8 +11,8 @@ import (
 )
 
 type Service interface {
-	Create(ctx context.Context, b *models.Book) error
-	Update(ctx context.Context, b *models.Book) error
+	Create(ctx context.Context, book *models.Book) error
+	Update(ctx context.Context, book *models.Book) error
 	Delete(ctx context.Context, id string) error
 	GetById(ctx context.Context, id string) (*models.Book, error)
 	GetAll(ctx context.Context) ([]models.Book, error)
@@ -32,53 +32,53 @@ func NewService(repo Repository) Service {
 	}
 }
 
-func (s *service) Create(ctx context.Context, b *models.Book) error {
-	_, err := s.authorService.GetById(ctx, b.AuthorId)
+func (s *service) Create(ctx context.Context, book *models.Book) error {
+	_, err := s.authorService.GetById(ctx, book.AuthorId)
 	if err != nil {
 		return err
 	}
 
-	_, err = s.seriesService.GetById(ctx, b.SeriesId)
+	_, err = s.seriesService.GetById(ctx, book.SeriesId)
 	if err != nil {
 		return err
 	}
 
-	for _, genre := range b.Genre {
+	for _, genre := range book.Genre {
 		_, err = s.genreService.GetByName(ctx, genre)
 		if err != nil {
-			return fmt.Errorf("error getting genre %s: %w", genre, err)
+			return err
 		}
 	}
 
-	if err := s.validator.Validate(b); err != nil {
+	if err := s.validator.Validate(book); err != nil {
 		return err
 	}
-	return s.repository.Create(ctx, b)
+	return s.repository.Create(ctx, book)
 }
 
-func (s *service) Update(ctx context.Context, b *models.Book) error {
-	_, err := s.authorService.GetById(ctx, b.AuthorId)
+func (s *service) Update(ctx context.Context, book *models.Book) error {
+	_, err := s.authorService.GetById(ctx, book.AuthorId)
 	if err != nil {
 		return err
 	}
 
-	_, err = s.seriesService.GetById(ctx, b.SeriesId)
+	_, err = s.seriesService.GetById(ctx, book.SeriesId)
 	if err != nil {
-		return err
+		return fmt.Errorf("error getting series: %w", err)
 	}
 
-	for _, genre := range b.Genre {
+	for _, genre := range book.Genre {
 		_, err = s.genreService.GetByName(ctx, genre)
 		if err != nil {
-			return fmt.Errorf("error getting genre %s: %w", genre, err)
+			return err
 		}
 	}
 
-	if err := s.validator.Validate(b); err != nil {
+	if err := s.validator.Validate(book); err != nil {
 		return err
 	}
 
-	return s.repository.Update(ctx, b)
+	return s.repository.Update(ctx, book)
 }
 
 func (s *service) Delete(ctx context.Context, id string) error {
@@ -92,9 +92,30 @@ func (s *service) GetById(ctx context.Context, id string) (*models.Book, error) 
 	if id == "" {
 		return nil, ErrEmptyId
 	}
-	return s.repository.GetById(ctx, id)
+
+	book, err := s.repository.GetById(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := s.validator.Validate(book); err != nil {
+		return nil, err
+	}
+
+	return book, nil
 }
 
 func (s *service) GetAll(ctx context.Context) ([]models.Book, error) {
-	return s.repository.GetAll(ctx)
+	books, err := s.repository.GetAll(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, book := range books {
+		if err := s.validator.Validate(&book); err != nil {
+			return nil, err
+		}
+	}
+
+	return books, nil
 }

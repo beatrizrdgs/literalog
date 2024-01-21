@@ -4,9 +4,9 @@ import "github.com/literalog/library/pkg/models"
 
 type Validator struct{}
 
-func (v *Validator) Validate(b *models.Book) error {
+func (v *Validator) Validate(book *models.Book) error {
 	switch {
-	case v.validateTitle(b.Title) != nil:
+	case v.validateTitle(book.Title) != nil:
 		return ErrInvalidTitle
 	default:
 		return nil
@@ -18,7 +18,7 @@ func (v *Validator) validateTitle(title string) error {
 		return ErrEmptyTitle
 	}
 
-	if len(title) < 3 || len(title) > 50 {
+	if len(title) < 2 || len(title) > 100 {
 		return ErrInvalidTitleLength
 	}
 

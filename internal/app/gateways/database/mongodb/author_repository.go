@@ -21,17 +21,17 @@ func NewAuthorRepository(collection *mongo.Collection) author.Repository {
 	}
 }
 
-func (r *AuthorRepository) Create(ctx context.Context, a *models.Author) error {
-	_, err := r.collection.InsertOne(ctx, a)
+func (r *AuthorRepository) Create(ctx context.Context, author *models.Author) error {
+	_, err := r.collection.InsertOne(ctx, author)
 	if err != nil {
 		return fmt.Errorf("error creating author: %w", err)
 	}
 	return nil
 }
 
-func (r *AuthorRepository) Update(ctx context.Context, a *models.Author) error {
-	filter := bson.M{"_id": a.Id}
-	update := bson.M{"$set": a}
+func (r *AuthorRepository) Update(ctx context.Context, author *models.Author) error {
+	filter := bson.M{"_id": author.Id}
+	update := bson.M{"$set": author}
 	if _, err := r.collection.UpdateOne(ctx, filter, update); err != nil {
 		return fmt.Errorf("error updating author: %w", err)
 	}
@@ -48,24 +48,24 @@ func (r *AuthorRepository) Delete(ctx context.Context, id string) error {
 
 func (r *AuthorRepository) GetById(ctx context.Context, id string) (*models.Author, error) {
 	filter := bson.M{"_id": id}
-	a := new(models.Author)
-	if err := r.collection.FindOne(ctx, filter).Decode(a); err != nil {
+	author := new(models.Author)
+	if err := r.collection.FindOne(ctx, filter).Decode(author); err != nil {
 		return nil, fmt.Errorf("error getting author: %w", err)
 	}
-	return a, nil
+	return author, nil
 }
 
 func (r *AuthorRepository) GetAll(ctx context.Context) ([]models.Author, error) {
-	aa := make([]models.Author, 0)
+	authors := make([]models.Author, 0)
 	cur, err := r.collection.Find(ctx, bson.D{})
 	if err != nil {
 		return nil, fmt.Errorf("error getting authors: %w", err)
 	}
 	defer cur.Close(ctx)
 
-	if err := cur.All(ctx, &aa); err != nil {
+	if err := cur.All(ctx, &authors); err != nil {
 		return nil, fmt.Errorf("error getting authors: %w", err)
 	}
 
-	return aa, nil
+	return authors, nil
 }

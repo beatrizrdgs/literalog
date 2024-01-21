@@ -1,14 +1,12 @@
-package author
+package genre
 
-import (
-	"github.com/literalog/library/pkg/models"
-)
+import "github.com/literalog/library/pkg/models"
 
 type Validator struct{}
 
-func (v *Validator) Validate(a *models.Author) error {
+func (v *Validator) Validate(genre *models.Genre) error {
 	switch {
-	case v.validateName(a.Name) != nil:
+	case v.validateName(genre.Name) != nil:
 		return ErrInvalidName
 	default:
 		return nil

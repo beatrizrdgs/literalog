@@ -1,4 +1,4 @@
-package series
+package genre
 
 import (
 	"net/http"

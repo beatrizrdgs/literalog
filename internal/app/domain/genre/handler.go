@@ -53,15 +53,15 @@ func (h *handler) Create(w http.ResponseWriter, r *http.Request) {
 	req := new(models.GenreRequest)
 	json.NewDecoder(r.Body).Decode(&req)
 
-	g := models.NewGenre(*req)
-	if err := h.service.Create(ctx, g); err != nil {
+	genre := models.NewGenre(*req)
+	if err := h.service.Create(ctx, genre); err != nil {
 		cerrors.Handle(err, w)
 		return
 	}
 
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(g)
+	json.NewEncoder(w).Encode(genre)
 }
 
 func (h *handler) Update(w http.ResponseWriter, r *http.Request) {
@@ -69,14 +69,14 @@ func (h *handler) Update(w http.ResponseWriter, r *http.Request) {
 	req := new(models.GenreRequest)
 	json.NewDecoder(r.Body).Decode(&req)
 
-	g := models.NewGenre(*req)
-	if err := h.service.Update(ctx, g); err != nil {
+	genre := models.NewGenre(*req)
+	if err := h.service.Update(ctx, genre); err != nil {
 		cerrors.Handle(err, w)
 		return
 	}
 
 	w.Header().Add("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(g)
+	json.NewEncoder(w).Encode(genre)
 }
 
 func (h *handler) Delete(w http.ResponseWriter, r *http.Request) {
@@ -95,26 +95,26 @@ func (h *handler) Delete(w http.ResponseWriter, r *http.Request) {
 func (h *handler) GetAll(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	gg, err := h.service.GetAll(ctx)
+	genre, err := h.service.GetAll(ctx)
 	if err != nil {
 		cerrors.Handle(err, w)
 		return
 	}
 
 	w.Header().Add("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(gg)
+	json.NewEncoder(w).Encode(genre)
 }
 
 func (h *handler) GetById(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	id := mux.Vars(r)["id"]
 
-	g, err := h.service.GetById(ctx, id)
+	genre, err := h.service.GetById(ctx, id)
 	if err != nil {
 		cerrors.Handle(err, w)
 		return
 	}
 
 	w.Header().Add("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(g)
+	json.NewEncoder(w).Encode(genre)
 }

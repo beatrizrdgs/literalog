@@ -53,15 +53,15 @@ func (h *handler) Create(w http.ResponseWriter, r *http.Request) {
 	req := new(models.SeriesRequest)
 	json.NewDecoder(r.Body).Decode(&req)
 
-	s := models.NewSeries(*req)
-	if err := h.service.Create(ctx, s); err != nil {
+	series := models.NewSeries(*req)
+	if err := h.service.Create(ctx, series); err != nil {
 		cerrors.Handle(err, w)
 		return
 	}
 
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(s)
+	json.NewEncoder(w).Encode(series)
 }
 
 func (h *handler) Update(w http.ResponseWriter, r *http.Request) {
@@ -69,14 +69,14 @@ func (h *handler) Update(w http.ResponseWriter, r *http.Request) {
 	req := new(models.SeriesRequest)
 	json.NewDecoder(r.Body).Decode(&req)
 
-	s := models.NewSeries(*req)
-	if err := h.service.Update(ctx, s); err != nil {
+	series := models.NewSeries(*req)
+	if err := h.service.Update(ctx, series); err != nil {
 		cerrors.Handle(err, w)
 		return
 	}
 
 	w.Header().Add("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(s)
+	json.NewEncoder(w).Encode(series)
 }
 
 func (h *handler) Delete(w http.ResponseWriter, r *http.Request) {
@@ -95,26 +95,26 @@ func (h *handler) Delete(w http.ResponseWriter, r *http.Request) {
 func (h *handler) GetAll(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	aa, err := h.service.GetAll(ctx)
+	series, err := h.service.GetAll(ctx)
 	if err != nil {
 		cerrors.Handle(err, w)
 		return
 	}
 
 	w.Header().Add("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(aa)
+	json.NewEncoder(w).Encode(series)
 }
 
 func (h *handler) GetById(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	id := mux.Vars(r)["id"]
 
-	a, err := h.service.GetById(ctx, id)
+	series, err := h.service.GetById(ctx, id)
 	if err != nil {
 		cerrors.Handle(err, w)
 		return
 	}
 
 	w.Header().Add("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(a)
+	json.NewEncoder(w).Encode(series)
 }

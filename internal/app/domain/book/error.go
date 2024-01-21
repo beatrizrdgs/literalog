@@ -11,5 +11,4 @@ var (
 	ErrInvalidTitle       = cerrors.New("invalid title", http.StatusBadRequest)
 	ErrEmptyTitle         = cerrors.New("empty title", http.StatusBadRequest)
 	ErrInvalidTitleLength = cerrors.New("title must be between x and y", http.StatusBadRequest)
-	ErrAuthorNotFound     = cerrors.New("", http.StatusBadRequest)
 )
