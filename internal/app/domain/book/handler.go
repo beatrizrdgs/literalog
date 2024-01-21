@@ -11,6 +11,7 @@ import (
 
 type Handler interface {
 	Create(w http.ResponseWriter, r *http.Request)
+	CreateByISBN(w http.ResponseWriter, r *http.Request)
 	Update(w http.ResponseWriter, r *http.Request)
 	Delete(w http.ResponseWriter, r *http.Request)
 	GetAll(w http.ResponseWriter, r *http.Request)
@@ -37,6 +38,7 @@ func NewHandler(s Service) Handler {
 
 func (h *handler) setupRoutes() {
 	h.router.HandleFunc("/", h.Create).Methods(http.MethodPost)
+	h.router.HandleFunc("/isbn/{isbn}", h.CreateByISBN).Methods(http.MethodPost)
 	h.router.HandleFunc("/", h.Update).Methods(http.MethodPut)
 	h.router.HandleFunc("/{id}", h.Delete).Methods(http.MethodDelete)
 	h.router.HandleFunc("/{id}", h.GetByID).Methods(http.MethodGet)
@@ -61,6 +63,18 @@ func (h *handler) Create(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(book)
+}
+
+func (h *handler) CreateByISBN(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	isbn := mux.Vars(r)["isbn"]
+
+	if err := h.service.CreateByISBN(ctx, isbn); err != nil {
+		cerrors.Handle(err, w)
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
 }
 
 func (h *handler) Update(w http.ResponseWriter, r *http.Request) {

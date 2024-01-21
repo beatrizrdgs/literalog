@@ -3,6 +3,7 @@ package book
 import (
 	"context"
 	"fmt"
+	"log"
 
 	"github.com/literalog/library/internal/app/domain/author"
 	"github.com/literalog/library/internal/app/domain/genre"
@@ -20,16 +21,22 @@ type Service interface {
 }
 
 type service struct {
-	repository    Repository
-	authorService author.Service
-	seriesService series.Service
-	genreService  genre.Service
-	validator     Validator
+	repository     Repository
+	isbnRepository ISBNRepository
+	authorService  author.Service
+	seriesService  series.Service
+	genreService   genre.Service
+	validator      Validator
 }
 
-func NewService(repo Repository) Service {
+func NewService(repo Repository, isbnRepo ISBNRepository, authorSvc author.Service, seriesSvc series.Service, genreSvc genre.Service) Service {
 	return &service{
-		repository: repo,
+		repository:     repo,
+		isbnRepository: isbnRepo,
+		authorService:  authorSvc,
+		seriesService:  seriesSvc,
+		genreService:   genreSvc,
+		validator:      Validator{},
 	}
 }
 
@@ -58,6 +65,17 @@ func (s *service) Create(ctx context.Context, book *models.Book) error {
 }
 
 func (s *service) CreateByISBN(ctx context.Context, isbn string) error {
+	if isbn == "" {
+		return ErrEmptyISBN
+	}
+
+	book, err := s.isbnRepository.Get(ctx, isbn)
+	if err != nil {
+		return err
+	}
+
+	log.Println(book)
+
 	return nil
 }
 

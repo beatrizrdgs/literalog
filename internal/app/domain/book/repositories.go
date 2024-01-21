@@ -13,3 +13,7 @@ type Repository interface {
 	GetByID(ctx context.Context, id string) (*models.Book, error)
 	GetAll(ctx context.Context) ([]models.Book, error)
 }
+
+type ISBNRepository interface {
+	Get(ctx context.Context, isbn string) (*models.Book, error)
+}

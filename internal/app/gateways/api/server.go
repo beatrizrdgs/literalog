@@ -8,6 +8,7 @@ import (
 	"github.com/literalog/library/internal/app/domain/book"
 	"github.com/literalog/library/internal/app/domain/genre"
 	"github.com/literalog/library/internal/app/domain/series"
+	"github.com/literalog/library/internal/app/gateways/apis"
 	"github.com/literalog/library/internal/app/gateways/database/mongodb"
 
 	"github.com/gorilla/mux"
@@ -20,11 +21,8 @@ type Server struct {
 }
 
 func NewServer(port string) Server {
-	s := Server{
-		port:     port,
-		logLevel: 1,
-		router:   mux.NewRouter(),
-	}
+
+	router := mux.NewRouter()
 
 	storage, err := mongodb.NewMongoStorage()
 	if err != nil {
@@ -45,16 +43,26 @@ func NewServer(port string) Server {
 	genreService := genre.NewService(genreRepository)
 	genreHandler := genre.NewHandler(genreService)
 
+	isbnRepository, err := apis.NewGBooksAPI("", "https://www.googleapis.com/books/v1")
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	bookRepository := mongodb.NewBookRepository(db.Collection("books"))
-	bookService := book.NewService(bookRepository)
+	bookService := book.NewService(bookRepository, isbnRepository, authorService, seriesService, genreService)
 	bookHandler := book.NewHandler(bookService)
 
-	s.router.PathPrefix("/authors").Handler(authorHandler.Routes())
-	s.router.PathPrefix("/series").Handler(seriesHandler.Routes())
-	s.router.PathPrefix("/genres").Handler(genreHandler.Routes())
-	s.router.PathPrefix("/books").Handler(bookHandler.Routes())
+	router.PathPrefix("/authors").Handler(authorHandler.Routes())
+	router.PathPrefix("/series").Handler(seriesHandler.Routes())
+	router.PathPrefix("/genres").Handler(genreHandler.Routes())
+	router.PathPrefix("/books").Handler(bookHandler.Routes())
 
-	return s
+	return Server{
+		port:     port,
+		logLevel: 1,
+		router:   router,
+	}
+
 }
 
 func (s *Server) ServeHttp() error {
