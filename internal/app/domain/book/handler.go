@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/gorilla/mux"
+	"github.com/go-chi/chi/v5"
 	"github.com/literalog/cerrors"
 	"github.com/literalog/library/pkg/models"
 )
@@ -17,18 +17,18 @@ type Handler interface {
 	GetAll(w http.ResponseWriter, r *http.Request)
 	GetByID(w http.ResponseWriter, r *http.Request)
 
-	Routes() *mux.Router
+	Routes() *chi.Mux
 }
 
 type handler struct {
 	service Service
-	router  *mux.Router
+	router  *chi.Mux
 }
 
 func NewHandler(s Service) Handler {
 	h := &handler{
 		service: s,
-		router:  mux.NewRouter(),
+		router:  chi.NewRouter(),
 	}
 
 	h.setupRoutes()
@@ -37,15 +37,15 @@ func NewHandler(s Service) Handler {
 }
 
 func (h *handler) setupRoutes() {
-	h.router.HandleFunc("/", h.Create).Methods(http.MethodPost)
-	h.router.HandleFunc("/isbn/{isbn}", h.CreateByISBN).Methods(http.MethodPost)
-	h.router.HandleFunc("/", h.Update).Methods(http.MethodPut)
-	h.router.HandleFunc("/{id}", h.Delete).Methods(http.MethodDelete)
-	h.router.HandleFunc("/{id}", h.GetByID).Methods(http.MethodGet)
-	h.router.HandleFunc("/", h.GetAll).Methods(http.MethodGet)
+	h.router.Post("/", h.Create)
+	h.router.Post("/isbn/{isbn}", h.CreateByISBN)
+	h.router.Put("/", h.Update)
+	h.router.Delete("/{id}", h.Delete)
+	h.router.Get("/{id}", h.GetByID)
+	h.router.Get("/", h.GetAll)
 }
 
-func (h handler) Routes() *mux.Router {
+func (h handler) Routes() *chi.Mux {
 	return h.router
 }
 
@@ -67,7 +67,7 @@ func (h *handler) Create(w http.ResponseWriter, r *http.Request) {
 
 func (h *handler) CreateByISBN(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	isbn := mux.Vars(r)["isbn"]
+	isbn := chi.URLParam(r, "isbn")
 
 	if err := h.service.CreateByISBN(ctx, isbn); err != nil {
 		cerrors.Handle(err, w)
@@ -95,7 +95,7 @@ func (h *handler) Update(w http.ResponseWriter, r *http.Request) {
 
 func (h *handler) Delete(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	id := mux.Vars(r)["id"]
+	id := chi.URLParam(r, "id")
 
 	if err := h.service.Delete(ctx, id); err != nil {
 		cerrors.Handle(err, w)
@@ -103,6 +103,20 @@ func (h *handler) Delete(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusNoContent)
+}
+
+func (h *handler) GetByID(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	id := chi.URLParam(r, "id")
+
+	book, err := h.service.GetByID(ctx, id)
+	if err != nil {
+		cerrors.Handle(err, w)
+		return
+	}
+
+	w.Header().Add("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(book)
 }
 
 func (h *handler) GetAll(w http.ResponseWriter, r *http.Request) {
@@ -116,18 +130,4 @@ func (h *handler) GetAll(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Add("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(books)
-}
-
-func (h *handler) GetByID(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-	id := mux.Vars(r)["id"]
-
-	book, err := h.service.GetByID(ctx, id)
-	if err != nil {
-		cerrors.Handle(err, w)
-		return
-	}
-
-	w.Header().Add("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(book)
 }

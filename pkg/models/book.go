@@ -9,7 +9,7 @@ import (
 type Book struct {
 	ID             string   `json:"id" bson:"_id"`
 	Title          string   `json:"title" bson:"title"`
-	AuthorID       string   `json:"author_id" bson:"author_id,omitempty"`
+	AuthorIDs      []string `json:"author_id" bson:"author_id,omitempty"`
 	ISBN           []string `json:"isbn" bson:"isbn,omitempty"`
 	SeriesID       string   `json:"series_id" bson:"series_id,omitempty"`
 	SeriesPosition int      `json:"series_position" bson:"series_position,omitempty"`
@@ -27,7 +27,7 @@ type Book struct {
 
 type BookRequest struct {
 	Title          string   `json:"title" bson:"title"`
-	AuthorID       string   `json:"author_id" bson:"author_id,omitempty"`
+	AuthorIDs      []string `json:"author_id" bson:"author_id,omitempty"`
 	ISBN           []string `json:"isbn" bson:"isbn,omitempty"`
 	SeriesID       string   `json:"series_id" bson:"series_id,omitempty"`
 	SeriesPosition int      `json:"series_position" bson:"series_position,omitempty"`
@@ -71,7 +71,7 @@ func NewBook(req BookRequest) *Book {
 	return &Book{
 		ID:             uuid.NewString(),
 		Title:          req.Title,
-		AuthorID:       req.AuthorID,
+		AuthorIDs:      req.AuthorIDs,
 		ISBN:           req.ISBN,
 		SeriesID:       req.SeriesID,
 		SeriesPosition: req.SeriesPosition,

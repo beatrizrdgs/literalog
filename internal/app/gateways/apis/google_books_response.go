@@ -26,7 +26,6 @@ type VolumeInfo struct {
 	Publisher           string               `json:"publisher"`
 	PublishedDate       string               `json:"publishedDate"`
 	Description         string               `json:"description"`
-	ReadingModes        string               `json:"readingModes"`
 	PageCount           int64                `json:"pageCount"`
 	PrintType           string               `json:"printType"`
 	Categories          []string             `json:"categories"`
@@ -85,5 +84,6 @@ func (i *Item) ToBook() (models.Book, error) {
 		Language:  i.VolumeInfo.Language,
 		Format:    format,
 		PagesNo:   int(i.VolumeInfo.PageCount),
+		AuthorIDs: i.VolumeInfo.Authors,
 	}, nil
 }

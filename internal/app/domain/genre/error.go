@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	ErrEmptyID     = cerrors.New("empty id", http.StatusBadRequest)
+	ErrEmptyID     = cerrors.New("empty genre id", http.StatusBadRequest)
 	ErrInvalidName = cerrors.New("invalid name", http.StatusBadRequest)
 	ErrEmptyName   = cerrors.New("empty name", http.StatusBadRequest)
 )

@@ -4,26 +4,22 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/literalog/library/internal/app/domain/author"
+	"github.com/go-chi/chi/v5"
+	"github.com/literalog/library/internal/app/domain/authors"
 	"github.com/literalog/library/internal/app/domain/book"
 	"github.com/literalog/library/internal/app/domain/genre"
 	"github.com/literalog/library/internal/app/domain/series"
 	"github.com/literalog/library/internal/app/gateways/apis"
 	"github.com/literalog/library/internal/app/gateways/database/mongodb"
-
-	"github.com/gorilla/mux"
 )
 
 type Server struct {
 	port     string
 	logLevel int
-	router   *mux.Router
+	router   *chi.Mux
 }
 
 func NewServer(port string) Server {
-
-	router := mux.NewRouter()
-
 	storage, err := mongodb.NewMongoStorage()
 	if err != nil {
 		log.Fatal(err)
@@ -32,8 +28,8 @@ func NewServer(port string) Server {
 	db := storage.Client.Database("library")
 
 	authorRepository := mongodb.NewAuthorRepository(db.Collection("authors"))
-	authorService := author.NewService(authorRepository)
-	authorHandler := author.NewHandler(authorService)
+	authorService := authors.NewService(authorRepository)
+	authorHandler := authors.NewHandler(authorService)
 
 	seriesRepository := mongodb.NewSeriesRepository(db.Collection("series"))
 	seriesService := series.NewService(seriesRepository)
@@ -52,17 +48,18 @@ func NewServer(port string) Server {
 	bookService := book.NewService(bookRepository, isbnRepository, authorService, seriesService, genreService)
 	bookHandler := book.NewHandler(bookService)
 
-	router.PathPrefix("/authors").Handler(authorHandler.Routes())
-	router.PathPrefix("/series").Handler(seriesHandler.Routes())
-	router.PathPrefix("/genres").Handler(genreHandler.Routes())
-	router.PathPrefix("/books").Handler(bookHandler.Routes())
+	router := chi.NewRouter()
+
+	router.Mount("/authors", authorHandler.Routes())
+	router.Mount("/series", seriesHandler.Routes())
+	router.Mount("/genre", genreHandler.Routes())
+	router.Mount("/books", bookHandler.Routes())
 
 	return Server{
 		port:     port,
 		logLevel: 1,
 		router:   router,
 	}
-
 }
 
 func (s *Server) ServeHttp() error {

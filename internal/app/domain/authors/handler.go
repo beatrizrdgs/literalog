@@ -1,4 +1,4 @@
-package author
+package authors
 
 import (
 	"encoding/json"
@@ -53,7 +53,7 @@ func (h *handler) Create(w http.ResponseWriter, r *http.Request) {
 	req := new(models.AuthorRequest)
 	json.NewDecoder(r.Body).Decode(&req)
 
-	author := models.NewAuthor(*req)
+	author := req.ToAuthor()
 	if err := h.service.Create(ctx, author); err != nil {
 		cerrors.Handle(err, w)
 		return
@@ -69,7 +69,7 @@ func (h *handler) Update(w http.ResponseWriter, r *http.Request) {
 	req := new(models.AuthorRequest)
 	json.NewDecoder(r.Body).Decode(&req)
 
-	author := models.NewAuthor(*req)
+	author := req.ToAuthor()
 	if err := h.service.Update(ctx, author); err != nil {
 		cerrors.Handle(err, w)
 		return

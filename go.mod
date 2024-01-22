@@ -3,11 +3,12 @@ module github.com/literalog/library
 go 1.21.5
 
 require (
+	github.com/go-chi/chi/v5 v5.0.11
 	github.com/google/uuid v1.5.0
 	github.com/gorilla/mux v1.8.1
+	github.com/literalog/cerrors v0.0.0-20240103162425-a0980901f0bb
 	github.com/spf13/cobra v1.8.0
 	go.mongodb.org/mongo-driver v1.13.1
-	github.com/literalog/cerrors v0.0.0-20240103162425-a0980901f0bb
 )
 
 require (

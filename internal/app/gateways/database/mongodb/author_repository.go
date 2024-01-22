@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/literalog/library/internal/app/domain/author"
+	"github.com/literalog/library/internal/app/domain/authors"
 	"github.com/literalog/library/pkg/models"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -15,7 +15,7 @@ type AuthorRepository struct {
 	collection *mongo.Collection
 }
 
-func NewAuthorRepository(collection *mongo.Collection) author.Repository {
+func NewAuthorRepository(collection *mongo.Collection) authors.Repository {
 	return &AuthorRepository{
 		collection: collection,
 	}
@@ -50,6 +50,18 @@ func (r *AuthorRepository) GetByID(ctx context.Context, id string) (*models.Auth
 	filter := bson.M{"_id": id}
 	author := new(models.Author)
 	if err := r.collection.FindOne(ctx, filter).Decode(author); err != nil {
+		return nil, fmt.Errorf("error getting author: %w", err)
+	}
+	return author, nil
+}
+
+func (r *AuthorRepository) GetByName(ctx context.Context, name string) (*models.Author, error) {
+	filter := bson.M{"name": name}
+	author := new(models.Author)
+	if err := r.collection.FindOne(ctx, filter).Decode(author); err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, authors.ErrNotFound
+		}
 		return nil, fmt.Errorf("error getting author: %w", err)
 	}
 	return author, nil

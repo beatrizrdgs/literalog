@@ -1,4 +1,4 @@
-package author
+package authors
 
 import (
 	"context"
@@ -11,6 +11,7 @@ type Service interface {
 	Update(ctx context.Context, author *models.Author) error
 	Delete(ctx context.Context, id string) error
 	GetByID(ctx context.Context, id string) (*models.Author, error)
+	GetByName(ctx context.Context, name string) (*models.Author, error)
 	GetAll(ctx context.Context) ([]models.Author, error)
 }
 
@@ -52,6 +53,23 @@ func (s *service) GetByID(ctx context.Context, id string) (*models.Author, error
 	}
 
 	author, err := s.repository.GetByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := s.validator.Validate(author); err != nil {
+		return nil, err
+	}
+
+	return author, nil
+}
+
+func (s *service) GetByName(ctx context.Context, name string) (*models.Author, error) {
+	if name == "" {
+		return nil, ErrEmptyName
+	}
+
+	author, err := s.repository.GetByName(ctx, name)
 	if err != nil {
 		return nil, err
 	}

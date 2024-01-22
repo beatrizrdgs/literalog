@@ -1,4 +1,4 @@
-package author
+package authors
 
 import (
 	"github.com/literalog/library/pkg/models"

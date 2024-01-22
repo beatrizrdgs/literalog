@@ -2,6 +2,8 @@ package apis
 
 import (
 	"context"
+	"encoding/json"
+	"io"
 	"net/http"
 	"net/url"
 	"os"
@@ -27,7 +29,6 @@ func NewGBooksAPI(key string, baseURL string) (*GBooksAPI, error) {
 }
 
 func (g *GBooksAPI) Get(ctx context.Context, isbn string) (*models.Book, error) {
-
 	u := g.BaseURL
 	u = u.JoinPath("volumes")
 
@@ -46,6 +47,27 @@ func (g *GBooksAPI) Get(ctx context.Context, isbn string) (*models.Book, error) 
 		return nil, err
 	}
 	defer resp.Body.Close()
+
+	gBook := new(GBookResponse)
+
+	b, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	err = json.Unmarshal(b, gBook)
+	if err != nil {
+		return nil, err
+	}
+
+	books, err := gBook.ToBooks()
+	if err != nil {
+		return nil, err
+	}
+
+	if len(books) > 0 {
+		return &books[0], nil
+	}
 
 	return nil, nil
 }

@@ -11,9 +11,13 @@ type AuthorRequest struct {
 	Name string `json:"name"`
 }
 
-func NewAuthor(req AuthorRequest) *Author {
+func (r *AuthorRequest) ToAuthor() *Author {
+	return NewAuthor(r.Name)
+}
+
+func NewAuthor(name string) *Author {
 	return &Author{
 		ID:   uuid.NewString(),
-		Name: req.Name,
+		Name: name,
 	}
 }

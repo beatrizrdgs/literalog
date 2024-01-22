@@ -1,4 +1,4 @@
-package author
+package authors
 
 import (
 	"net/http"
@@ -7,7 +7,8 @@ import (
 )
 
 var (
-	ErrEmptyID     = cerrors.New("empty id", http.StatusBadRequest)
+	ErrEmptyID     = cerrors.New("empty author id", http.StatusBadRequest)
 	ErrInvalidName = cerrors.New("invalid name", http.StatusBadRequest)
 	ErrEmptyName   = cerrors.New("empty name", http.StatusBadRequest)
+	ErrNotFound    = cerrors.New("author not found", http.StatusNotFound)
 )

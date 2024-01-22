@@ -2,10 +2,8 @@ package book
 
 import (
 	"context"
-	"fmt"
-	"log"
 
-	"github.com/literalog/library/internal/app/domain/author"
+	"github.com/literalog/library/internal/app/domain/authors"
 	"github.com/literalog/library/internal/app/domain/genre"
 	"github.com/literalog/library/internal/app/domain/series"
 	"github.com/literalog/library/pkg/models"
@@ -23,13 +21,13 @@ type Service interface {
 type service struct {
 	repository     Repository
 	isbnRepository ISBNRepository
-	authorService  author.Service
+	authorService  authors.Service
 	seriesService  series.Service
 	genreService   genre.Service
 	validator      Validator
 }
 
-func NewService(repo Repository, isbnRepo ISBNRepository, authorSvc author.Service, seriesSvc series.Service, genreSvc genre.Service) Service {
+func NewService(repo Repository, isbnRepo ISBNRepository, authorSvc authors.Service, seriesSvc series.Service, genreSvc genre.Service) Service {
 	return &service{
 		repository:     repo,
 		isbnRepository: isbnRepo,
@@ -41,20 +39,30 @@ func NewService(repo Repository, isbnRepo ISBNRepository, authorSvc author.Servi
 }
 
 func (s *service) Create(ctx context.Context, book *models.Book) error {
-	_, err := s.authorService.GetByID(ctx, book.AuthorID)
-	if err != nil {
-		return err
+	if book.AuthorIDs == nil || len(book.AuthorIDs) == 0 {
+		return ErrEmptyAuthors
 	}
 
-	_, err = s.seriesService.GetByID(ctx, book.SeriesID)
-	if err != nil {
-		return err
-	}
-
-	for _, genre := range book.Genre {
-		_, err = s.genreService.GetByName(ctx, genre)
+	for _, author := range book.AuthorIDs {
+		_, err := s.authorService.GetByID(ctx, author)
 		if err != nil {
 			return err
+		}
+	}
+
+	if book.SeriesID != "" {
+		_, err := s.seriesService.GetByID(ctx, book.SeriesID)
+		if err != nil {
+			return err
+		}
+	}
+
+	if book.Genre != nil {
+		for _, genre := range book.Genre {
+			_, err := s.genreService.GetByName(ctx, genre)
+			if err != nil {
+				return err
+			}
 		}
 	}
 
@@ -74,20 +82,39 @@ func (s *service) CreateByISBN(ctx context.Context, isbn string) error {
 		return err
 	}
 
-	log.Println(book)
-
-	return nil
-}
-
-func (s *service) Update(ctx context.Context, book *models.Book) error {
-	_, err := s.authorService.GetByID(ctx, book.AuthorID)
-	if err != nil {
+	if err := s.validator.Validate(book); err != nil {
 		return err
 	}
 
-	_, err = s.seriesService.GetByID(ctx, book.SeriesID)
+	for i := range book.AuthorIDs {
+		author, err := s.authorService.GetByName(ctx, book.AuthorIDs[i])
+		switch {
+		case err == authors.ErrNotFound:
+			author = models.NewAuthor(book.AuthorIDs[i])
+			if err := s.authorService.Create(ctx, author); err != nil {
+				return err
+			}
+		case err != nil:
+			return err
+		}
+
+		book.AuthorIDs[i] = author.ID
+	}
+
+	return s.Create(ctx, book)
+}
+
+func (s *service) Update(ctx context.Context, book *models.Book) error {
+	for _, author := range book.AuthorIDs {
+		_, err := s.authorService.GetByID(ctx, author)
+		if err != nil {
+			return err
+		}
+	}
+
+	_, err := s.seriesService.GetByID(ctx, book.SeriesID)
 	if err != nil {
-		return fmt.Errorf("error getting series: %w", err)
+		return err
 	}
 
 	for _, genre := range book.Genre {
