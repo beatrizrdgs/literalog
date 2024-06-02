@@ -51,8 +51,9 @@ func (s *Server) routes() {
 	})
 
 	s.router.Route("/books", func(r chi.Router) {
-		// r.Post("/", s.BookHandler.Add)
-		r.Get("/{id}", s.BookHandler.GetById)
+		r.Post("/", s.BookHandler.CreateBook)
+		r.Get("/{id}", s.BookHandler.GetBookById)
+		r.Get("/", s.BookHandler.GetAllBooks)
 	})
 
 	// s.router.Route("/logbooks", func(r chi.Router) {
