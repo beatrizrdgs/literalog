@@ -1,18 +1,46 @@
-# Library
+<a name="readme-top"></a>
 
-This module focuses on the management of books and related entities.
 
-## Entities
-You can check the specifications under /pkg/models/*.
 
-### Book
-The Book entity represents an individual book and includes relevant information such as title, author, genre, series affiliation, and additional details.
+<div align="center">
 
-### Author
-The Author entity represents the person who wrote the book. It includes the author's name.
+[![Contributors][contributors-shield]][contributors-url] [![Forks][forks-shield]][forks-url] [![Stargazers][stars-shield]][stars-url] [![Issues][issues-shield]][issues-url] [![AGPL][license-shield]][license-url]
 
-### Genre
-The Genre entity represents the category or type of book. It includes the genre name.
+</div>
 
-### Series
-The Series entity represents a collection of books that are related or connected in some way. It includes the series name.
+
+
+<!-- PROJECT LOGO -->
+<br />
+<div align="center">
+  <a href="https://github.com/beatrizrdgs/literalog">
+    <img src="https://i.imgur.com/nTlxWzW.png" alt="Logo" width="80" height="80">
+  </a>
+
+<h3 align="center">Literalog</h3>
+
+  <p align="center">
+    A logbook for your literary explorations
+    <br />
+    <a href="https://github.com/beatrizrdgs/literalog/tree/main/docs"><strong>Explore the docs »</strong></a>
+    <br />
+    <a href="https://github.com/beatrizrdgs/literalog/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
+    ·
+    <a href="https://github.com/beatrizrdgs/literalog/issues/new?labels=enhancement&template=feature-request---.md">Request Feature</a>
+    ·
+    <a href="https://github.com/beatrizrdgs/literalog/issues">Open Issues</a>
+  </p>
+</div>
+
+<!-- MARKDOWN LINKS & IMAGES -->
+<!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
+[contributors-shield]: https://img.shields.io/github/contributors/beatrizrdgs/literalog.svg?style=for-the-badge
+[contributors-url]: https://github.com/beatrizrdgs/literalog/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/beatrizrdgs/literalog.svg?style=for-the-badge
+[forks-url]: https://github.com/beatrizrdgs/literalog/network/members
+[stars-shield]: https://img.shields.io/github/stars/beatrizrdgs/literalog.svg?style=for-the-badge
+[stars-url]: https://github.com/beatrizrdgs/literalog/stargazers
+[issues-shield]: https://img.shields.io/github/issues/beatrizrdgs/literalog.svg?style=for-the-badge
+[issues-url]: https://github.com/beatrizrdgs/literalog/issues
+[license-shield]: https://img.shields.io/github/license/beatrizrdgs/literalog.svg?style=for-the-badge
+[license-url]: https://github.com/beatrizrdgs/literalog/blob/main/LICENSE

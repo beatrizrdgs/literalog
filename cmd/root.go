@@ -1,20 +1,24 @@
 package cmd
 
 import (
+	"os"
+
 	"github.com/spf13/cobra"
 )
 
 var profile string
 
 var rootCmd = &cobra.Command{
-	Use:   "library",
-	Short: "literalog's management of books and related entities",
-}
-
-func init() {
-	rootCmd.PersistentFlags().StringVar(&profile, "profile", "development", "application profile (default is development)")
+	Use: "literalog",
 }
 
 func Execute() {
-	cobra.CheckErr(rootCmd.Execute())
+	err := rootCmd.Execute()
+	if err != nil {
+		os.Exit(1)
+	}
+}
+
+func init() {
+	rootCmd.PersistentFlags().StringVar(&profile, "profile", "dev", "default profile is dev")
 }

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Reading Habits Tracker</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Include your CSS file here -->
+    <script src="https://unpkg.com/htmx.org@1.7.0"></script>
+    <style>
+        /* Basic Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Body Styling */
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #f4f4f4;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Header Styling */
+        header {
+            background: #333;
+            color: #fff;
+            padding: 1rem 0;
+            text-align: center;
+        }
+
+        header h1 {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Navigation Styling */
+        nav ul {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+            padding: 0;
+        }
+
+        nav li {
+            margin: 0 1rem;
+        }
+
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            padding: 0.5rem;
+            transition: background 0.3s;
+        }
+
+        nav a:hover {
+            background: #575757;
+            border-radius: 5px;
+        }
+
+        /* Main Content Styling */
+        main {
+            flex: 1;
+            padding: 1rem;
+            background: #fff;
+            margin: 1rem;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #content h2 {
+            margin-bottom: 1rem;
+        }
+
+        /* Footer Styling */
+        footer {
+            background: #333;
+            color: #fff;
+            text-align: center;
+            padding: 1rem 0;
+            margin-top: auto;
+        }
+
+        /* Additional Styles */
+        .book-list, .currently-reading, .to-read {
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>My Reading Habits Tracker</h1>
+        <nav>
+            <ul>
+                <li><a href="#book-list" hx-get="/book-list" hx-target="#content">Book List</a></li>
+                <li><a href="#currently-reading" hx-get="/currently-reading" hx-target="#content">Currently Reading</a></li>
+                <li><a href="#to-read" hx-get="/to-read" hx-target="#content">To Read</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section id="content">
+            <h2>Welcome to My Reading Tracker</h2>
+            <p>Track your reading habits, explore new books, and manage your reading lists.</p>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2024 My Reading Habits Tracker</p>
+    </footer>
+
+    <!-- Template for dynamically loading content -->
+    <template id="book-list-template">
+        <h2>Book List</h2>
+        <!-- The book list content will be loaded here -->
+        <div id="book-list-content" class="book-list" hx-get="/get-book-list" hx-trigger="load"></div>
+    </template>
+
+    <template id="currently-reading-template">
+        <h2>Currently Reading</h2>
+        <!-- The currently reading content will be loaded here -->
+        <div id="currently-reading-content" class="currently-reading" hx-get="/get-currently-reading" hx-trigger="load"></div>
+    </template>
+
+    <template id="to-read-template">
+        <h2>To Read</h2>
+        <!-- The to-read content will be loaded here -->
+        <div id="to-read-content" class="to-read" hx-get="/get-to-read" hx-trigger="load"></div>
+    </template>
+
+    <script>
+        document.querySelectorAll('nav a').forEach(link => {
+            link.addEventListener('click', function (event) {
+                event.preventDefault();
+                const target = document.querySelector(link.getAttribute('href').split('#')[1] + '-template');
+                document.querySelector('#content').innerHTML = target.innerHTML;
+            });
+        });
+    </script>
+</body>
+</html>
